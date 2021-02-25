@@ -5,6 +5,7 @@ IncludeCmd: yes
 # IMPORTANT: When you are going to work inside the container remember to source these 2 file in order to set the proper module environment with spack and Lmod
 # source /opt/spack/share/spack/setup-env.sh && source /usr/share/lmod/6.6/init/sh
 
+
 %post
 
 export DEBIAN_FRONTEND=noninteractive
@@ -117,20 +118,24 @@ EOF
 
 chmod a+x /opt/snapshot_env.sh
 
+cat > /opt/script_add_environment.py <<EOF
+import glob
+import os
+
+ompi_path = glob.glob("/opt/spack/opt/spack/linux-*/gcc-*/openmpi*")[0]
+mod_path = glob.glob("/opt/spack/opt/spack/linux-*/gcc-*")[0]
+envfile = os.environ["SINGULARITY_ENVIRONMENT"]
+with open(envfile, "a") as f:
+    f.write("export PATH={}/bin:$PATH\n".format(ompi_path))
+    f.write("export LD_LIBRARY_PATH={}/lib:$LD_LIBRARY_PATH\n".format(ompi_path))
+    f.write("export MODULEPATH={}\n".format(mod_path))
+
+EOF
+
+python3 /opt/script_add_environment.py
+
+
 %environment
 
 export SPACK_ROOT=/opt/spack
-export PATH=/opt/spack/opt/spack/linux-ubuntu20.04-broadwell/gcc-9.3.0/openmpi-4.0.2-owzfevj6srkxyy4bpu2c3plnv3skxtqm/bin:/opt/spack/bin:/usr/share/lmod/6.6/libexec:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 export LMOD_CMD=/usr/share/lmod/lmod/libexec/lmod
-export MODULEPATH=/opt/spack/share/spack/modules/linux-ubuntu20.04-broadwell:/opt/spack/opt/spack/linux-ubuntu20.04-skylake/gcc-9.3.0
-export LIBRARY_PATH=/opt/spack/opt/spack/linux-ubuntu20.04-broadwell/gcc-9.3.0/openmpi-4.0.2-owzfevj6srkxyy4bpu2c3plnv3skxtqm/lib
-export LD_LIBRARY_PATH=/opt/spack/opt/spack/linux-ubuntu20.04-broadwell/gcc-9.3.0/openmpi-4.0.2-owzfevj6srkxyy4bpu2c3plnv3skxtqm/lib
-export INCLUDE=/opt/spack/opt/spack/linux-ubuntu20.04-broadwell/gcc-9.3.0/openmpi-4.0.2-owzfevj6srkxyy4bpu2c3plnv3skxtqm/include
-export C_INCLUDE_PATH=/opt/spack/opt/spack/linux-ubuntu20.04-broadwell/gcc-9.3.0/openmpi-4.0.2-owzfevj6srkxyy4bpu2c3plnv3skxtqm/include
-export CPLUS_INCLUDE_PATH=/opt/spack/opt/spack/linux-ubuntu20.04-broadwell/gcc-9.3.0/openmpi-4.0.2-owzfevj6srkxyy4bpu2c3plnv3skxtqm/include
-export CMAKE_PREFIX_PATH=/opt/spack/opt/spack/linux-ubuntu20.04-broadwell/gcc-9.3.0/openmpi-4.0.2-owzfevj6srkxyy4bpu2c3plnv3skxtqm
-export MANPATH=/opt/spack/opt/spack/linux-ubuntu20.04-broadwell/gcc-9.3.0/openmpi-4.0.2-owzfevj6srkxyy4bpu2c3plnv3skxtqm/share/man
-export MPICC=/opt/spack/opt/spack/linux-ubuntu20.04-broadwell/gcc-9.3.0/openmpi-4.0.2-owzfevj6srkxyy4bpu2c3plnv3skxtqm/bin/mpicc
-export MPICXX=/opt/spack/opt/spack/linux-ubuntu20.04-broadwell/gcc-9.3.0/openmpi-4.0.2-owzfevj6srkxyy4bpu2c3plnv3skxtqm/bin/mpic++
-export MPIF90=/opt/spack/opt/spack/linux-ubuntu20.04-broadwell/gcc-9.3.0/openmpi-4.0.2-owzfevj6srkxyy4bpu2c3plnv3skxtqm/bin/mpif90
-export MPIF77=/opt/spack/opt/spack/linux-ubuntu20.04-broadwell/gcc-9.3.0/openmpi-4.0.2-owzfevj6srkxyy4bpu2c3plnv3skxtqm/bin/mpif77
