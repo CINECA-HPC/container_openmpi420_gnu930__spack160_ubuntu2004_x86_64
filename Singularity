@@ -2,6 +2,7 @@ Bootstrap: docker
 From: ubuntu:20.04
 IncludeCmd: yes
 
+
 # IMPORTANT: When you are going to work inside the container remember to source these 2 file in order to set the proper module environment with spack and Lmod
 # source /opt/spack/share/spack/setup-env.sh && source /usr/share/lmod/6.6/init/sh
 
